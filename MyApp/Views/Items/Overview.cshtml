@@ -1,0 +1,16 @@
+﻿@model MyApp.Models.Item
+
+@{
+	ViewData["Title"] = "Items";
+
+	var item = Model.Name;
+	var items = new List<String> { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+}
+
+<p>This is the name of item @item</p>
+
+@foreach(var item_name in items){
+	<ul>
+		<li>@item_name</li>
+	</ul>
+}
