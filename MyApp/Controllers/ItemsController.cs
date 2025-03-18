@@ -50,7 +50,6 @@ namespace MyApp.Controllers
         {
             var item = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
 
-            Console.WriteLine(item);
             return View(item);
         }
 
@@ -73,14 +72,36 @@ namespace MyApp.Controllers
             return View(item);
         }
 
-        //public IActionResult Overview()
-        //{
-        //    var item = new Item() { Name = "Keyboard" };
-        //    return View(item);
-        //}
+        public async Task<IActionResult> Delete(int id)
+        {
+            var item = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
 
-        //public IActionResult Edit(int id) {
-        //    return Content($"ID = {id}");
-        //}
+            if(item != null) ViewData["response_id"] = item.Id;
+
+            return View(item);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var item = await _context.Items.FindAsync(id);
+
+            try
+            {
+                if (item != null)
+                {
+                    _context.Items.Remove(item);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+               
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+
+            return View(item);
+        }
     }
 }
