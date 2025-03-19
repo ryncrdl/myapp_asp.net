@@ -6,7 +6,11 @@
 
 <nav class="navbar">
     <h1>List of Items</h1>
-    <a asp-controller="Items" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i></a>
+    <button type="button" class="btn btn-primary create-btn" data-bs-toggle="modal"
+            data-bs-target="#create_modal">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+    @* <a asp-controller="Items" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i></a> *@
 </nav>
 
 <table class="table">
@@ -21,21 +25,91 @@
     <tbody>
         @foreach(var item in Model)
         {
-           <tr>
+            <tr>
                 <td>@item.Id</td>
                 <td>@item.Name</td>
-                <td>@item.Price</td>
+                <td>₱ @item.Price.ToString("N2")</td>
                 <td>
-                    <a asp-route-id="@item.Id" asp-action="Edit" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
+                    @* <a asp-route-id="@item.Id" asp-action="Edit" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a> *@
+                    <button type="button" class="btn btn-primary edit-btn" data-bs-toggle="modal"
+                            data-bs-target="#edit_modal" data-edit-id="@item.Id" data-edit-name="@item.Name" data-edit-price="@item.Price">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    
                     <button type="button" class="btn btn-danger delete-btn" data-bs-toggle="modal" 
-                    data-bs-target="#delete_modal" data-id="@item.Id" data-name="@item.Name">
+                        data-bs-target="#delete_modal" data-id="@item.Id">
                         <i class="bi bi-trash3"></i>
                     </button>
                 </td>
-           </tr>
+            </tr>
+        }
+
+        @if (Model.Count() <= 0)
+        {
+            <tr>
+                <td colspan="4" class="text-center text-lg-center fs-4 p-4">No Items Found! :(</td>
+            </tr>
         }
     </tbody>
 </table>
+
+@* Create Item Modal *@
+<div class="modal fade" id="create_modal" tabindex="-1" aria-labelledby="create_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="create_modal_label">Create Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Items" asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" placeholder="Item name" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Price</span>
+                        <input type="Number" class="form-control" id="Price" name="Price" required>
+                        <span class="input-group-text">.00</span>
+                    </div>
+
+                    <button type="Submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Edit Item Modal *@
+<div class="modal fade" id="edit_modal" tabindex="-1" aria-labelledby="edit_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit_modal_label">Update Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Items" asp-action="Edit" method="post">
+                    <input type="hidden" class="form-control" id="Edit_Id" name="Id">
+
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="Edit_Name" name="Name" placeholder="Item name" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Price</span>
+                        <input type="Number" class="form-control" id="Edit_Price" name="Price" required>
+                        <span class="input-group-text">.00</span>
+                    </div>
+
+                    <button type="Submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="delete_modal" tabindex="-1" aria-labelledby="delete_modal_label" aria-hidden="true">
     <div class="modal-dialog">
@@ -63,10 +137,20 @@
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function () {
                 let itemId = this.getAttribute('data-id');
-                let itemName = this.getAttribute('data-name');
 
                 document.getElementById('delete_item_id').value = itemId;
-                document.getElementById('delete_item_name').innerText = itemName;
+            });
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                let itemId = this.getAttribute('data-edit-id');
+                let itemName = this.getAttribute('data-edit-name');
+                let itemPrice = this.getAttribute('data-edit-price');
+
+                document.getElementById('Edit_Id').value = itemId;
+                document.getElementById('Edit_Name').value = itemName;
+                document.getElementById('Edit_Price').value = itemPrice;
             });
         });
     });

@@ -21,39 +21,41 @@ namespace MyApp.Controllers
             return View(items);
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
+        //public IActionResult Create()
+        //{
+        //    return View();
+        //}
 
         [HttpPost]
-        public IActionResult Create([Bind("Name, Price")] Item item) {
+        public IActionResult Create(string Name, double Price) {
 
             try
             {
-                if (ModelState.IsValid)
+             
+                if (ModelState.IsValid && !(String.IsNullOrEmpty(Name) || Double.IsNaN(Price)))
                 {
-                     _context.Items.Add(item);
+                    var item = new Item() { Name = Name, Price = Price };
+                    _context.Items.Add(item);
                     _context.SaveChanges();
-
+                    Console.WriteLine(item);
                     return RedirectToAction("Index");
                 }
             }
             catch (Exception ex) {
                 ModelState.AddModelError("", ex.Message);
             }
-            return View(item);
+            return RedirectToAction("Index");
         }
 
 
-        public async Task<IActionResult> Edit(int id)
-        {
-            var item = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
+        //public async Task<IActionResult> Edit(int id)
+        //{
+        //    var item = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
 
-            return View(item);
-        }
+        //    return View(item);
+        //}
 
-        [HttpPost, ActionName("Update")]
+        [HttpPost]
         public async Task<IActionResult> Edit(int id, [Bind("Id, Name, Price")] Item item)
         {
             try
